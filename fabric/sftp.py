@@ -17,7 +17,12 @@ class SFTP(object):
     SFTP helper class, which is also a facade for ssh.SFTPClient.
     """
     def __init__(self, host_string):
-        self.ftp = connections[host_string].open_sftp()
+        try:
+            self.ftp = connections[host_string].open_sftp()
+        except Exception as err:
+            connections[host_string].close()
+            del connections[host_string]
+            self.ftp = connections[host_string].open_sftp()
 
     # Recall that __getattr__ is the "fallback" attribute getter, and is thus
     # pretty safe to use for facade-like behavior as we're doing here.
